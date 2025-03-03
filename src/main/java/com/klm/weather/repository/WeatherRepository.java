@@ -12,5 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface WeatherRepository extends JpaRepository<Weather, Integer> {
 	
 	public List<Weather> findByDate(Date date);
- 
+	public List<Weather> findByCityInIgnoreCase(List<String> city);
+  
 }

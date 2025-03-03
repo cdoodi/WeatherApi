@@ -32,8 +32,8 @@ public class WeatherApiRestController {
 	}
 	
 	@GetMapping
-	public List<Weather> getWeather(@RequestParam(required = false) String date) throws ParseException{
+	public List<Weather> getWeather(@RequestParam(required = false) String date, @RequestParam(required = false) String city) throws ParseException{
 		
-		return weatherService.getWeather(date);
+		return weatherService.getWeather(date,city);
 	}
 }
