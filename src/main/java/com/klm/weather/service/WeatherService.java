@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,15 +30,25 @@ public class WeatherService {
 
 	}
 
-	public List<Weather> getWeather(String date, String city) throws ParseException {
+	
+	public Optional<Weather> getWeatherById(Integer id) {
+		return weatherRepository.findById(id);
+	}
+
+	public List<Weather> getWeather(String date, String city, String sort) throws ParseException {
 		if (date != null) {
 			return weatherRepository.findByDate(simpleDateFormat.parse(date));
 		}
-		if(city != null) {
-			logger.info("City string value is :"+city);
+		if (city != null) {
+
 			List<String> cityList = Arrays.asList(city.split(","));
-			logger.info("City value after list:"+cityList.toString());
+
 			return weatherRepository.findByCityInIgnoreCase(cityList);
+		}
+		if ("date".equalsIgnoreCase(sort)) {
+			return weatherRepository.findAllByOrderByDateAsc();
+		} else if ("-date".equalsIgnoreCase(sort)) {
+			return weatherRepository.findAllByOrderByDateDesc();
 		}
 
 		return weatherRepository.findAll();
