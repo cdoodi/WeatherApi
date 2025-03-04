@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,31 +37,30 @@ public class WeatherService {
 	}
 
 	@Transactional
-	public Weather saveWeather(WeatherDto weatherDto) {
+	public WeatherDto saveWeather(WeatherDto weatherDto) {
 
 		Weather weather = convertToWeather(weatherDto);
 
-		return weatherRepository.save(weather);
+		return convertToWeatherDto(weatherRepository.save(weather));
 
 	}
 
-	private Weather convertToWeather(WeatherDto weatherDto) {
-		Weather weather = new Weather();
-		weather.setCity(weatherDto.getCity());
-		weather.setDate(weatherDto.getDate());
-		weather.setLat(weatherDto.getLat());
-		weather.setLon(weatherDto.getLon());
-		weather.setState(weatherDto.getState());
-		weather.setTemperatures(weatherDto.getTemperatures());
+	private static Weather convertToWeather(WeatherDto weatherDto) {
+		Weather weather = new Weather(weatherDto.getDate(), weatherDto.getLat(), weatherDto.getLon(),
+				weatherDto.getCity(), weatherDto.getState(), weatherDto.getTemperatures());
 
 		return weather;
 	}
 
-	public Optional<Weather> getWeatherById(Integer id) {
-		return weatherRepository.findById(id);
+	public Optional<WeatherDto> getWeatherById(Integer id) {
+
+		Optional<Weather> weather = weatherRepository.findById(id);
+
+		return weather.isPresent() ? Optional.of(convertToWeatherDto(weather.get())) : Optional.empty();
+
 	}
 
-	public List<Weather> getWeather(String date, String city, String sort) {
+	public List<WeatherDto> getWeather(String date, String city, String sort) {
 		Date convertedDate = null;
 		Specification<Weather> weatherSpec = Specification.where(null);
 		if (date != null) {
@@ -82,7 +82,16 @@ public class WeatherService {
 			sortOrder = Sort.unsorted();
 		}
 		logger.info("Final sort order is:{}", sortOrder.toString());
-		return weatherRepository.findAll(weatherSpec, sortOrder);
+		List<Weather> weatherList = weatherRepository.findAll(weatherSpec, sortOrder);
+		return weatherList.stream().map(WeatherService::convertToWeatherDto).collect(Collectors.toList());
+	}
+
+	private static WeatherDto convertToWeatherDto(Weather weather) {
+
+		WeatherDto weatherDto = new WeatherDto(weather.getDate(), weather.getLat(), weather.getLon(), weather.getCity(),
+				weather.getState(), weather.getTemperatures());
+		weatherDto.setId(weather.getId());
+		return weatherDto;
 	}
 
 }

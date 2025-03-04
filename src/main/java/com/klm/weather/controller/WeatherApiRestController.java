@@ -33,15 +33,15 @@ public class WeatherApiRestController {
 
 
 	@PostMapping
-	public ResponseEntity<Weather> addWeather(@RequestBody WeatherDto weatherDto) {
+	public ResponseEntity<WeatherDto> addWeather(@RequestBody WeatherDto weatherDto) {
 
-		ResponseEntity<Weather> postResponseEntity = ResponseEntity.status(HttpStatus.CREATED)
+		ResponseEntity<WeatherDto> postResponseEntity = ResponseEntity.status(HttpStatus.CREATED)
 				.body(weatherService.saveWeather(weatherDto));
 		return postResponseEntity;
 	}
 
 	@GetMapping
-	public List<Weather> getWeather(@RequestParam(required = false) String date,
+	public List<WeatherDto> getWeather(@RequestParam(required = false) String date,
 			@RequestParam(required = false) String city, @RequestParam(required = false) String sort)
 			 {
 
@@ -50,11 +50,11 @@ public class WeatherApiRestController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Weather> getWeatherbyId(@PathVariable Integer id) {
+	public ResponseEntity<WeatherDto> getWeatherbyId(@PathVariable Integer id) {
 
-		Optional<Weather> weather = weatherService.getWeatherById(id);
+		Optional<WeatherDto> weatherDto = weatherService.getWeatherById(id);
 
-		return weather.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+		return weatherDto.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 
 	}
 }
