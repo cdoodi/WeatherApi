@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.klm.weather.dao.WeatherDto;
 import com.klm.weather.model.Weather;
 import com.klm.weather.service.WeatherService;
 
@@ -32,10 +33,10 @@ public class WeatherApiRestController {
 
 
 	@PostMapping
-	public ResponseEntity<Weather> addWeather(@RequestBody Weather weather) {
+	public ResponseEntity<Weather> addWeather(@RequestBody WeatherDto weatherDto) {
 
 		ResponseEntity<Weather> postResponseEntity = ResponseEntity.status(HttpStatus.CREATED)
-				.body(weatherService.saveWeather(weather));
+				.body(weatherService.saveWeather(weatherDto));
 		return postResponseEntity;
 	}
 

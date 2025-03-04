@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.klm.weather.dao.WeatherDto;
 import com.klm.weather.exception.InvalidInputException;
 import com.klm.weather.model.Weather;
 import com.klm.weather.repository.WeatherRepository;
@@ -28,7 +29,6 @@ public class WeatherService {
 
 	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
 	private final WeatherRepository weatherRepository;
 
 	public WeatherService(WeatherRepository weatherRepository) {
@@ -36,10 +36,24 @@ public class WeatherService {
 	}
 
 	@Transactional
-	public Weather saveWeather(Weather weather) {
+	public Weather saveWeather(WeatherDto weatherDto) {
+
+		Weather weather = convertToWeather(weatherDto);
 
 		return weatherRepository.save(weather);
 
+	}
+
+	private Weather convertToWeather(WeatherDto weatherDto) {
+		Weather weather = new Weather();
+		weather.setCity(weatherDto.getCity());
+		weather.setDate(weatherDto.getDate());
+		weather.setLat(weatherDto.getLat());
+		weather.setLon(weatherDto.getLon());
+		weather.setState(weatherDto.getState());
+		weather.setTemperatures(weatherDto.getTemperatures());
+
+		return weather;
 	}
 
 	public Optional<Weather> getWeatherById(Integer id) {
@@ -67,7 +81,7 @@ public class WeatherService {
 		} else {
 			sortOrder = Sort.unsorted();
 		}
-		logger.info("Final sort order is:{}",sortOrder.toString());
+		logger.info("Final sort order is:{}", sortOrder.toString());
 		return weatherRepository.findAll(weatherSpec, sortOrder);
 	}
 
